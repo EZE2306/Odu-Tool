@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odu Ifá — Learn the 16 Meji</title>
+<style>
+  /* Self-contained font stack — no internet required */
+  :root {
+    --font-display: 'Palatino Linotype', 'Book Antiqua', Palatino, 'Times New Roman', Georgia, serif;
+    --font-body:    Georgia, 'Times New Roman', serif;
+    --font-mono:    'Courier New', Courier, monospace;
+  }
+</style>
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8cc7a;
+    --gold-dim: #7a6030;
+    --ink: #1a1410;
+    --paper: #f5efe0;
+    --paper-dark: #ede4cc;
+    --red: #8b2020;
+    --cream: #faf6ec;
+    --shadow: rgba(10,6,0,0.35);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 1000; opacity: 0.4;
+  }
+
+  header {
+    text-align: center;
+    padding: 3rem 1rem 1.5rem;
+    border-bottom: 1px solid var(--gold-dim);
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    display: block;
+    width: 200px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 1rem auto 0;
+  }
+
+  .eyebrow {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 400;
+    color: var(--gold-light);
+    letter-spacing: 0.05em;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    color: #a09070;
+    font-style: italic;
+    margin-top: 0.3rem;
+  }
+
+  /* Mode tabs */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin: 2rem auto;
+    max-width: 500px;
+    border: 1px solid var(--gold-dim);
+  }
+
+  .tab {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    background: none;
+    border: none;
+    color: #a09070;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-right: 1px solid var(--gold-dim);
+  }
+  .tab:last-child { border-right: none; }
+  .tab.active { background: var(--gold-dim); color: var(--gold-light); }
+  .tab:hover:not(.active) { background: rgba(201,168,76,0.08); color: var(--gold); }
+
+  /* ============ FLASHCARD MODE ============ */
+  #flashcard-mode { display: none; }
+  #flashcard-mode.active { display: block; }
+
+  .card-arena {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 1rem 3rem;
+  }
+
+  .progress-bar-wrap {
+    width: 100%;
+    max-width: 460px;
+    height: 2px;
+    background: #2a2018;
+    margin-bottom: 1.5rem;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    transition: width 0.4s ease;
+  }
+
+  .card-counter {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.2em;
+    margin-bottom: 1rem;
+  }
+
+  .flashcard {
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 3/2.6;
+    perspective: 1000px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .flashcard-inner {
+    position: relative;
+    width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.65s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .flashcard.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border: 1px solid var(--gold-dim);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #1e1810 0%, #120e08 100%);
+    padding: 2rem;
+  }
+
+  .card-front::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px solid rgba(201,168,76,0.15);
+    pointer-events: none;
+  }
+
+  .card-back {
+    transform: rotateY(180deg);
+    background: linear-gradient(145deg, #f5efe0 0%, #ede4cc 100%);
+    color: var(--ink);
+  }
+
+  .card-hint {
+    position: absolute;
+    bottom: 0.8rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    font-family: var(--font-display);
+    opacity: 0.4;
+    text-transform: uppercase;
+  }
+
+  /* ── OPELE CHAIN RENDERING ────────────────────────────────────────── */
+  /*
+     The opele is a chain of 8 seed-pods (4 on each arm).
+     Each pod lands one of two ways:
+       open  (concave up, "U") = single mark  (ìṣẹ̀ kan)
+       closed (convex up, "⌒") = double mark (ìṣẹ̀ méjì)
+     We draw the chain horizontally: left arm | right arm,
+     each arm being a vertical column of 4 pods connected by a cord.
+  */
+
+  .opele-chain {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+    margin: 0.4rem 0;
+  }
+
+  /* The centre knot / handle between the two arms */
+  .opele-knot {
+    width: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-top: 10px;
+  }
+  .opele-knot::before {
+    content: '';
+    display: block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #e8cc7a, #7a5c1a);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  }
+
+  /* One arm = vertical column of pods + connecting cord */
+  .opele-arm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    position: relative;
+  }
+
+  /* The cord running through the arm */
+  .opele-arm::before {
+    content: '';
+    position: absolute;
+    top: 10px; bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    background: linear-gradient(180deg, #5a3a0a, #8a6020, #5a3a0a);
+    border-radius: 1px;
+    z-index: 0;
+  }
+
+  /* Individual pod wrapper */
+  .pod-wrap {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3px 0;
+  }
+
+  /* SVG pod sizing */
+  .pod {
+    display: block;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.55));
+    transition: transform 0.15s ease;
+  }
+  .pod.large { width: 38px; height: 26px; }
+  .pod.small { width: 28px; height: 19px; }
+
+  /* divider between the two groups of 4 (for mixed Odu) */
+  .opele-divider {
+    width: 2px;
+    height: 8px;
+    background: rgba(201,168,76,0.25);
+    align-self: center;
+  }
+
+  .card-name {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--gold-light);
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+
+  .card-back .card-name {
+    color: var(--ink);
+    font-size: 2rem;
+    margin-top: 0.5rem;
+  }
+
+  .card-back .card-number {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--gold-dim);
+    margin-bottom: 0.3rem;
+  }
+
+  /* nav buttons */
+  .card-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .nav-btn {
+    background: none;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    width: 42px; height: 42px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+    font-family: var(--font-body);
+  }
+  .nav-btn:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); }
+  .nav-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+  .shuffle-btn {
+    background: none;
+    border: 1px solid var(--gold-dim);
+    color: #a09070;
+    padding: 0.4rem 1rem;
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .shuffle-btn:hover { color: var(--gold); border-color: var(--gold); }
+
+  /* ============ QUIZ MODE ============ */
+  #quiz-mode { display: none; }
+  #quiz-mode.active { display: block; }
+
+  .quiz-arena {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 1rem 1rem 3rem;
+  }
+
+  .quiz-score-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.1em;
+  }
+
+  .score-val { color: var(--gold); }
+
+  .quiz-question {
+    background: linear-gradient(145deg, #1e1810, #120e08);
+    border: 1px solid var(--gold-dim);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .quiz-question::after {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border: 1px solid rgba(201,168,76,0.08);
+    pointer-events: none;
+  }
+
+  .quiz-prompt {
+    font-size: 0.65rem;
+    font-family: var(--font-display);
+    letter-spacing: 0.3em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+
+  .quiz-name {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--gold-light);
+    letter-spacing: 0.05em;
+  }
+
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+
+  .option-btn {
+    background: linear-gradient(145deg, #1e1810, #120e08);
+    border: 1px solid var(--gold-dim);
+    padding: 0.8rem 0.5rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.06);
+  }
+
+  .option-btn.correct {
+    border-color: #4a8a4a;
+    background: rgba(74,138,74,0.12);
+  }
+
+  .option-btn.wrong {
+    border-color: var(--red);
+    background: rgba(139,32,32,0.12);
+  }
+
+  .option-btn:disabled { cursor: default; }
+
+  .option-label {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    color: #a09070;
+    letter-spacing: 0.15em;
+  }
+
+  .option-btn.correct .option-label { color: #7ac47a; }
+  .option-btn.wrong .option-label { color: #c47a7a; }
+
+  .feedback {
+    text-align: center;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-style: italic;
+    min-height: 3rem;
+    color: var(--gold-light);
+  }
+
+  .next-btn {
+    display: block;
+    margin: 0 auto;
+    background: none;
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    padding: 0.6rem 2.5rem;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .next-btn:hover { background: rgba(201,168,76,0.1); }
+  .next-btn:disabled { opacity: 0; cursor: default; }
+
+  /* ============ GRID MODE ============ */
+  #grid-mode { display: none; }
+  #grid-mode.active { display: block; }
+
+  .grid-arena {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 1rem 1rem 3rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+
+  .grid-card {
+    border: 1px solid var(--gold-dim);
+    background: linear-gradient(145deg, #1e1810, #120e08);
+    padding: 1.2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.2s;
+    cursor: default;
+  }
+
+  .grid-card:hover {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .grid-number {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.2em;
+  }
+
+  .grid-name {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    color: var(--gold-light);
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+
+  /* Result screen */
+  .result-screen {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .result-screen h2 {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    color: var(--gold-light);
+    margin-bottom: 0.5rem;
+  }
+
+  .result-screen p {
+    color: #a09070;
+    font-size: 1.1rem;
+    font-style: italic;
+    margin-bottom: 2rem;
+  }
+
+  .result-score {
+    font-family: var(--font-mono);
+    font-size: 3rem;
+    color: var(--gold);
+    margin: 1rem 0;
+  }
+
+  .restart-btn {
+    background: none;
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    padding: 0.8rem 3rem;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .restart-btn:hover { background: rgba(201,168,76,0.1); }
+
+  .quiz-type-selector {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .qtype-btn {
+    background: none;
+    border: 1px solid var(--gold-dim);
+    color: #a09070;
+    padding: 0.4rem 1rem;
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .qtype-btn.active { background: var(--gold-dim); color: var(--gold-light); border-color: var(--gold-dim); }
+  .qtype-btn:hover:not(.active) { border-color: var(--gold); color: var(--gold); }
+
+
+  .opele-mixed {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .opele-plus {
+    font-family: var(--font-display);
+    color: var(--gold-dim);
+    font-size: 1rem;
+    line-height: 1;
+    align-self: center;
+  }
+  .quiz-set-selector {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .qset-btn {
+    background: none;
+    border: 1px solid var(--gold-dim);
+    color: #a09070;
+    padding: 0.35rem 0.9rem;
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .qset-btn.active { background: var(--gold-dim); color: var(--gold-light); border-color: var(--gold-dim); }
+  .qset-btn:hover:not(.active) { border-color: var(--gold); color: var(--gold); }
+
+  .card-parents {
+    font-size: 0.75rem;
+    color: var(--gold-dim);
+    font-style: italic;
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.05em;
+  }
+
+  .quiz-sub {
+    font-size: 0.8rem;
+    color: var(--gold-dim);
+    font-style: italic;
+    margin-top: 0.3rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Sacred Knowledge</div>
+  <h1>Odu Ifá</h1>
+  <p class="subtitle">The Sixteen Principal Meji</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="setMode('grid')">All 16</button>
+  <button class="tab" onclick="setMode('flashcard')">Flashcards</button>
+  <button class="tab" onclick="setMode('quiz')">Quiz</button>
+</div>
+
+<div id="grid-mode" class="active">
+  <div class="grid-arena" id="grid-arena"></div>
+</div>
+
+<div id="flashcard-mode">
+  <div class="card-arena">
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="fc-progress"></div></div>
+    <div class="card-counter" id="fc-counter"></div>
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="flashcard-inner">
+        <div class="card-face card-front" id="card-front"></div>
+        <div class="card-face card-back" id="card-back"></div>
+      </div>
+    </div>
+    <div class="card-nav">
+      <button class="nav-btn" id="btn-prev" onclick="prevCard()">←</button>
+      <button class="shuffle-btn" onclick="shuffleCards()">SHUFFLE</button>
+      <button class="nav-btn" id="btn-next" onclick="nextCard()">→</button>
+    </div>
+  </div>
+</div>
+
+<div id="quiz-mode">
+  <div class="quiz-arena">
+    <div class="quiz-type-selector">
+      <button class="qtype-btn active" onclick="setQuizType('mark2name', this)">Mark → Name</button>
+      <button class="qtype-btn" onclick="setQuizType('name2mark', this)">Name → Mark</button>
+    </div>
+    <div class="quiz-set-selector">
+      <button class="qset-btn active" onclick="setQuizSet('meji', this)">16 Meji</button>
+      <button class="qset-btn" onclick="setQuizSet('mixed', this)">Mixed Odu</button>
+      <button class="qset-btn" onclick="setQuizSet('both', this)">Both</button>
+    </div>
+    <div id="quiz-content"></div>
+  </div>
+</div>
+
+<script>
+// ─── BASE 16 MEJI ────────────────────────────────────────────────────────────
+// mark = 8 rows (top 4 = left parent, bottom 4 = right parent), each row [left, right]
+const MEJI = [
+  { id: "ogbe",     name: "Eji-Ogbe",      mark: [[1,1],[1,1],[1,1],[1,1]] },
+  { id: "oyeku",    name: "Oyeku Meji",     mark: [[2,2],[2,2],[2,2],[2,2]] },
+  { id: "iwori",    name: "Iwori Meji",     mark: [[2,2],[1,1],[1,1],[2,2]] },
+  { id: "odi",      name: "Odi Meji",       mark: [[1,1],[2,2],[2,2],[1,1]] },
+  { id: "irosun",   name: "Irosun Meji",    mark: [[1,1],[1,1],[2,2],[2,2]] },
+  { id: "owonrin",  name: "Owonrin Meji",   mark: [[2,2],[2,2],[1,1],[1,1]] },
+  { id: "obara",    name: "Obara Meji",     mark: [[1,1],[2,2],[2,2],[2,2]] },
+  { id: "okanran",  name: "Okanran Meji",   mark: [[2,2],[2,2],[2,2],[1,1]] },
+  { id: "ogunda",   name: "Ogunda Meji",    mark: [[1,1],[1,1],[1,1],[2,2]] },
+  { id: "osa",      name: "Osa Meji",       mark: [[2,2],[1,1],[1,1],[1,1]] },
+  { id: "ika",      name: "Ika Meji",       mark: [[2,2],[1,1],[2,2],[2,2]] },
+  { id: "oturupon", name: "Oturupon Meji",  mark: [[2,2],[2,2],[1,1],[2,2]] },
+  { id: "otura",    name: "Otura Meji",     mark: [[1,1],[2,2],[1,1],[1,1]] },
+  { id: "irete",    name: "Irete Meji",     mark: [[1,1],[1,1],[2,2],[1,1]] },
+  { id: "ose",      name: "Ose Meji",       mark: [[1,1],[2,2],[1,1],[2,2]] },
+  { id: "ofun",     name: "Ofun Meji",      mark: [[2,2],[1,1],[2,2],[1,1]] },
+];
+
+// Helper: get base 4-row pattern for a given Meji id
+function basePattern(id) {
+  return MEJI.find(m => m.id === id).mark;
+}
+
+// Build a mixed Odu from two parent ids: top half = A, bottom half = B
+function mixedOdu(nameA, idA, nameB, idB) {
+  return {
+    id: `${idA}-${idB}`,
+    name: `${nameA}-${nameB}`,
+    mark: [...basePattern(idA), ...basePattern(idB)],
+    mixed: true,
+    parentA: nameA,
+    parentB: nameB,
+  };
+}
+
+// ─── CURATED MIXED ODU (top ~42 commonly studied pairs) ─────────────────────
+const MIXED = [
+  // Ogbe combinations
+  mixedOdu("Ogbe", "ogbe", "Oyeku",   "oyeku"),
+  mixedOdu("Ogbe", "ogbe", "Iwori",   "iwori"),
+  mixedOdu("Ogbe", "ogbe", "Odi",     "odi"),
+  mixedOdu("Ogbe", "ogbe", "Irosun",  "irosun"),
+  mixedOdu("Ogbe", "ogbe", "Owonrin", "owonrin"),
+  mixedOdu("Ogbe", "ogbe", "Obara",   "obara"),
+  mixedOdu("Ogbe", "ogbe", "Okanran", "okanran"),
+  mixedOdu("Ogbe", "ogbe", "Ogunda",  "ogunda"),
+  mixedOdu("Ogbe", "ogbe", "Osa",     "osa"),
+  // Oyeku combinations
+  mixedOdu("Oyeku", "oyeku", "Ogbe",    "ogbe"),
+  mixedOdu("Oyeku", "oyeku", "Iwori",   "iwori"),
+  mixedOdu("Oyeku", "oyeku", "Odi",     "odi"),
+  mixedOdu("Oyeku", "oyeku", "Irosun",  "irosun"),
+  mixedOdu("Oyeku", "oyeku", "Owonrin", "owonrin"),
+  mixedOdu("Oyeku", "oyeku", "Obara",   "obara"),
+  // Iwori combinations
+  mixedOdu("Iwori", "iwori", "Ogbe",    "ogbe"),
+  mixedOdu("Iwori", "iwori", "Oyeku",   "oyeku"),
+  mixedOdu("Iwori", "iwori", "Odi",     "odi"),
+  mixedOdu("Iwori", "iwori", "Obara",   "obara"),
+  mixedOdu("Iwori", "iwori", "Ogunda",  "ogunda"),
+  // Odi combinations
+  mixedOdu("Odi",   "odi",   "Ogbe",    "ogbe"),
+  mixedOdu("Odi",   "odi",   "Oyeku",   "oyeku"),
+  mixedOdu("Odi",   "odi",   "Obara",   "obara"),
+  // Irosun combinations
+  mixedOdu("Irosun","irosun","Ogbe",    "ogbe"),
+  mixedOdu("Irosun","irosun","Owonrin", "owonrin"),
+  mixedOdu("Irosun","irosun","Ogunda",  "ogunda"),
+  // Owonrin combinations
+  mixedOdu("Owonrin","owonrin","Ogbe",  "ogbe"),
+  mixedOdu("Owonrin","owonrin","Irosun","irosun"),
+  mixedOdu("Owonrin","owonrin","Obara", "obara"),
+  // Obara combinations
+  mixedOdu("Obara", "obara", "Ogbe",    "ogbe"),
+  mixedOdu("Obara", "obara", "Oyeku",   "oyeku"),
+  mixedOdu("Obara", "obara", "Ogunda",  "ogunda"),
+  // Okanran combos
+  mixedOdu("Okanran","okanran","Ogbe",  "ogbe"),
+  mixedOdu("Okanran","okanran","Osa",   "osa"),
+  // Ogunda combos
+  mixedOdu("Ogunda","ogunda","Ogbe",    "ogbe"),
+  mixedOdu("Ogunda","ogunda","Osa",     "osa"),
+  mixedOdu("Ogunda","ogunda","Otura",   "otura"),
+  // Osa combos
+  mixedOdu("Osa",   "osa",   "Ogbe",    "ogbe"),
+  mixedOdu("Osa",   "osa",   "Ogunda",  "ogunda"),
+  // Otura / Irete / Ose / Ofun
+  mixedOdu("Otura", "otura", "Ogbe",    "ogbe"),
+  mixedOdu("Irete", "irete", "Ogbe",    "ogbe"),
+  mixedOdu("Ose",   "ose",   "Otura",   "otura"),
+  mixedOdu("Ofun",  "ofun",  "Ogbe",    "ogbe"),
+];
+
+// All combined pool
+const ALL_ODU = [...MEJI, ...MIXED];
+
+// ─── OPELE MARK RENDERING ───────────────────────────────────────────────────
+// Each Odu has 8 rows (4 per arm). Each row has [left, right] value.
+// 1 = open pod (concave up, "U-shape") = single mark
+// 2 = closed pod (convex up, dome)     = double mark
+//
+// The opele chain is shown as TWO vertical arms side by side.
+// Left arm = left column of all rows; Right arm = right column of all rows.
+
+function podSVG(type, sz) {
+  const dimmed = false;
+  // sz: 'large' | 'small'
+  const w = sz === 'large' ? 38 : 28;
+  const h = sz === 'large' ? 26 : 19;
+  const opacity = dimmed ? 0.55 : 1;
+
+  if (type === 1) {
+    // OPEN pod — concave up (U shape), like a seed facing open-side up
+    // The hollow shows, surface is the rim. Light hits the inside curve.
+    return `<svg class="pod ${sz}" viewBox="0 0 38 26" xmlns="http://www.w3.org/2000/svg" style="opacity:${opacity}">
+      <defs>
+        <radialGradient id="og${w}" cx="50%" cy="70%" r="60%">
+          <stop offset="0%" stop-color="#e8cc7a"/>
+          <stop offset="40%" stop-color="#a07830"/>
+          <stop offset="100%" stop-color="#4a2e08"/>
+        </radialGradient>
+        <radialGradient id="oi${w}" cx="50%" cy="20%" r="70%">
+          <stop offset="0%" stop-color="#fdf0c0"/>
+          <stop offset="60%" stop-color="#c8a050"/>
+          <stop offset="100%" stop-color="#6a4010"/>
+        </radialGradient>
+      </defs>
+      <!-- outer shell, U-curve (open top) -->
+      <path d="M4,4 Q4,22 19,22 Q34,22 34,4" fill="url(#og${w})" stroke="#3a2008" stroke-width="1"/>
+      <!-- inner hollow -->
+      <path d="M8,4 Q8,18 19,18 Q30,18 30,4" fill="url(#oi${w})"/>
+      <!-- top rim highlight -->
+      <line x1="4" y1="4" x2="8" y2="4" stroke="#e8d080" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="30" y1="4" x2="34" y2="4" stroke="#e8d080" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- cord hole top-left -->
+      <circle cx="6" cy="4" r="2" fill="#1a0e04" stroke="#5a3a0a" stroke-width="0.5"/>
+      <!-- cord hole top-right -->
+      <circle cx="32" cy="4" r="2" fill="#1a0e04" stroke="#5a3a0a" stroke-width="0.5"/>
+    </svg>`;
+  } else {
+    // CLOSED pod — convex up (dome/hump), like a seed resting on its back
+    return `<svg class="pod ${sz}" viewBox="0 0 38 26" xmlns="http://www.w3.org/2000/svg" style="opacity:${opacity}">
+      <defs>
+        <radialGradient id="cg${w}" cx="50%" cy="30%" r="65%">
+          <stop offset="0%" stop-color="#e8cc7a"/>
+          <stop offset="50%" stop-color="#8a6020"/>
+          <stop offset="100%" stop-color="#3a1e04"/>
+        </radialGradient>
+      </defs>
+      <!-- dome shape -->
+      <path d="M4,22 Q4,4 19,4 Q34,4 34,22 Z" fill="url(#cg${w})" stroke="#3a2008" stroke-width="1"/>
+      <!-- highlight ridge -->
+      <path d="M12,8 Q19,5 26,8" fill="none" stroke="#f0dc90" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+      <!-- cord hole bottom-left -->
+      <circle cx="6" cy="22" r="2" fill="#1a0e04" stroke="#5a3a0a" stroke-width="0.5"/>
+      <!-- cord hole bottom-right -->
+      <circle cx="32" cy="22" r="2" fill="#1a0e04" stroke="#5a3a0a" stroke-width="0.5"/>
+    </svg>`;
+  }
+}
+
+function buildChain(rows, sz) {
+  // rows: array of 4 [left, right] pairs
+  // returns HTML for one full opele (left arm + knot + right arm)
+  function arm(colIdx) {
+    let html = `<div class="opele-arm">`;
+    for (let r = 0; r < 4; r++) {
+      const type = rows[r][colIdx];
+      html += `<div class="pod-wrap">${podSVG(type, sz)}</div>`;
+    }
+    html += `</div>`;
+    return html;
+  }
+  return `<div class="opele-chain">
+    ${arm(0)}
+    <div class="opele-knot"></div>
+    ${arm(1)}
+  </div>`;
+}
+
+function renderMark(mark, large = false, darkBg = true, mixed = false) {
+  const sz = large ? 'large' : 'small';
+  if (!mixed || mark.length === 4) {
+    // Pure Meji: single chain of 4 pods per arm
+    return buildChain(mark, sz);
+  } else {
+    // Mixed Odu: two chains (parent A top-4, parent B bottom-4) with a + between
+    const topRows = mark.slice(0, 4);
+    const botRows = mark.slice(4, 8);
+    return `<div class="opele-mixed">
+      ${buildChain(topRows, sz)}
+      <div class="opele-plus">+</div>
+      ${buildChain(botRows, sz)}
+    </div>`;
+  }
+}
+
+// ─── GRID MODE ───────────────────────────────────────────────────────────────
+function buildGrid() {
+  const arena = document.getElementById('grid-arena');
+  arena.innerHTML = MEJI.map((o, i) => `
+    <div class="grid-card">
+      <div class="grid-number">ODU ${String(i+1).padStart(2,'0')}</div>
+      ${renderMark(o.mark, false, true, false)}
+      <div class="grid-name">${o.name}</div>
+    </div>
+  `).join('');
+}
+
+// ─── FLASHCARD MODE ──────────────────────────────────────────────────────────
+let fcDeck = [...MEJI];
+let fcIndex = 0;
+
+function shuffleCards() {
+  fcDeck = [...MEJI].sort(() => Math.random() - 0.5);
+  fcIndex = 0;
+  renderCard();
+  document.getElementById('flashcard').classList.remove('flipped');
+}
+
+function renderCard() {
+  const o = fcDeck[fcIndex];
+  const total = fcDeck.length;
+  document.getElementById('fc-counter').textContent = `${fcIndex + 1} / ${total}`;
+  document.getElementById('fc-progress').style.width = `${((fcIndex + 1) / total) * 100}%`;
+  document.getElementById('btn-prev').disabled = fcIndex === 0;
+  document.getElementById('btn-next').disabled = fcIndex === total - 1;
+
+  document.getElementById('card-front').innerHTML = `
+    ${renderMark(o.mark, true, true, !!o.mixed)}
+    <span class="card-hint">Tap to reveal</span>
+  `;
+  document.getElementById('card-back').innerHTML = `
+    <div class="card-name">${o.name}</div>
+    ${o.mixed ? `<div class="card-parents">${o.parentA} + ${o.parentB}</div>` : ''}
+    ${renderMark(o.mark, false, false, !!o.mixed)}
+    <span class="card-hint">Tap to flip back</span>
+  `;
+  document.getElementById('flashcard').classList.remove('flipped');
+}
+
+function flipCard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+}
+function nextCard() { if (fcIndex < fcDeck.length - 1) { fcIndex++; renderCard(); } }
+function prevCard() { if (fcIndex > 0) { fcIndex--; renderCard(); } }
+
+// ─── QUIZ MODE ───────────────────────────────────────────────────────────────
+let quizType   = 'mark2name';
+let quizSet    = 'meji';      // 'meji' | 'mixed' | 'both'
+let quizQueue  = [];
+let quizIdx    = 0;
+let quizScore  = 0;
+let quizAnswered = false;
+
+function setQuizType(type, btn) {
+  quizType = type;
+  document.querySelectorAll('.qtype-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  startQuiz();
+}
+
+function setQuizSet(set, btn) {
+  quizSet = set;
+  document.querySelectorAll('.qset-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  startQuiz();
+}
+
+function getPool() {
+  if (quizSet === 'meji')  return MEJI;
+  if (quizSet === 'mixed') return MIXED;
+  return ALL_ODU;
+}
+
+function startQuiz() {
+  quizQueue = [...getPool()].sort(() => Math.random() - 0.5);
+  quizIdx   = 0;
+  quizScore = 0;
+  quizAnswered = false;
+  renderQuiz();
+}
+
+function getWrongOptions(correct, pool) {
+  const others = pool.filter(o => o.id !== correct.id);
+  return others.sort(() => Math.random() - 0.5).slice(0, 3);
+}
+
+function renderQuiz() {
+  const qc = document.getElementById('quiz-content');
+  if (quizIdx >= quizQueue.length) {
+    qc.innerHTML = `
+      <div class="result-screen">
+        <h2>Complete</h2>
+        <p>Your knowledge has been measured</p>
+        <div class="result-score">${quizScore} / ${quizQueue.length}</div>
+        <button class="restart-btn" onclick="startQuiz()">Try Again</button>
+      </div>`;
+    return;
+  }
+
+  const correct = quizQueue[quizIdx];
+  const pool    = getPool();
+  // For wrong options: draw from same pool but if mixed quiz pick from same "type" where possible
+  const wrongPool = pool.length >= 4 ? pool : ALL_ODU;
+  const wrong   = getWrongOptions(correct, wrongPool);
+  const options = [...wrong, correct].sort(() => Math.random() - 0.5);
+  quizAnswered  = false;
+
+  const isMixed = !!correct.mixed;
+  let questionHTML, optionHTML;
+
+  if (quizType === 'name2mark') {
+    questionHTML = `
+      <div class="quiz-prompt">Which mark belongs to this Odu?</div>
+      <div class="quiz-name">${correct.name}</div>
+      ${isMixed ? `<div class="quiz-sub">${correct.parentA} · ${correct.parentB}</div>` : ''}`;
+    optionHTML = options.map(o => `
+      <button class="option-btn" onclick="checkAnswer(this)" data-id="${o.id}" data-correct="${correct.id}">
+        ${renderMark(o.mark, false, true, !!o.mixed)}
+        <span class="option-label">${o.name}</span>
+      </button>`).join('');
+  } else {
+    questionHTML = `
+      <div class="quiz-prompt">Name this Odu</div>
+      ${renderMark(correct.mark, true, true, isMixed)}`;
+    optionHTML = options.map(o => `
+      <button class="option-btn" onclick="checkAnswer(this)" data-id="${o.id}" data-correct="${correct.id}">
+        <span class="option-label">${o.name}</span>
+      </button>`).join('');
+  }
+
+  qc.innerHTML = `
+    <div class="quiz-score-bar">
+      <span>Question ${quizIdx + 1} / ${quizQueue.length}</span>
+      <span>Score <span class="score-val">${quizScore}</span></span>
+    </div>
+    <div class="quiz-question">${questionHTML}</div>
+    <div class="quiz-options">${optionHTML}</div>
+    <div class="feedback" id="quiz-feedback"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()" disabled>Next →</button>`;
+}
+
+function checkAnswer(btn) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+
+  const correctId = btn.dataset.correct;
+  const isCorrect = btn.dataset.id === correctId;
+
+  const allBtns = document.querySelectorAll('.option-btn');
+  allBtns.forEach(b => {
+    b.disabled = true;
+    if (b.dataset.id === correctId) b.classList.add('correct');
+  });
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    quizScore++;
+    document.getElementById('quiz-feedback').textContent = 'Àṣà — correct!';
+  } else {
+    btn.classList.add('wrong');
+    const correctOdu = ALL_ODU.find(o => o.id === correctId);
+    document.getElementById('quiz-feedback').textContent = `Not quite — that was ${correctOdu.name}`;
+  }
+
+  document.getElementById('next-btn').disabled = false;
+}
+
+function nextQuestion() { quizIdx++; renderQuiz(); }
+
+// ─── MODE SWITCHING ──────────────────────────────────────────────────────────
+function setMode(mode) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['grid','flashcard','quiz'][i] === mode);
+  });
+  ['grid','flashcard','quiz'].forEach(m => {
+    document.getElementById(m + '-mode').classList.toggle('active', m === mode);
+  });
+  if (mode === 'quiz') startQuiz();
+  if (mode === 'flashcard') { fcDeck = [...MEJI]; fcIndex = 0; renderCard(); }
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+buildGrid();
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('flashcard-mode').classList.contains('active')) return;
+  if (e.key === 'ArrowRight') nextCard();
+  if (e.key === 'ArrowLeft')  prevCard();
+  if (e.key === ' ') { e.preventDefault(); flipCard(); }
+});
+</script>
+</body>
+</html>
